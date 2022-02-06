@@ -15,6 +15,7 @@ kotoken = config.get('token', 'kot_token')
 pixabay = config.get('token', 'pixabay_token')
 amount = 200
 tags = 'cute+cat'
+pic_send = 0
 
 pic_json = resfreshPics()
 
@@ -27,24 +28,26 @@ def get_text_messages(message):
     print(f'Sent message to {message.chat.id}: {message.text}')
 
 def get_photo(bot, pic_json):
+    global pic_send
     IDs = [247725614, 836465463]
     now = datetime.datetime.now()
     hour = now.hour
     minute = now.minute
     if hour == 8 and minute >= 55 or hour == 9 and minute <= 5:
-        for item in IDs:
-            bot.send_message(item, 'Вставай, сонный котенок!')
-            bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-    elif hour == 22 and minute >= 55 or hour == 23 and minute <= 5:
-         for item in IDs:
-            bot.send_message(item, 'Сладких снов, китя)')
-            bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-
+        if pic_send == 0:
+            for item in IDs:
+                bot.send_message(item, 'Вставай, сонный котенок!')
+                bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+            pic_send = 1
+    elif hour == 19 and minute >= 50 or hour == 20 and minute <= 0:
+        if pic_send == 0:
+            for item in IDs:
+                bot.send_message(item, 'Сладких снов, китя)')
+                bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+            pic_send = 1
+    else: pic_send = 0
     tt = threading.Timer(300.0, get_photo, args=[bot, pic_json])
     tt.start()
-
-t = threading.Timer(300.0, get_photo, args=[bot, pic_json])
-t.start()  
 
 get_photo(bot, pic_json)              
 
