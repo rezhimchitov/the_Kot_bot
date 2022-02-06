@@ -39,7 +39,7 @@ def get_photo(bot, pic_json):
                 bot.send_message(item, 'Вставай, сонный котенок!')
                 bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
             pic_send = 1
-    elif hour == 19 and minute >= 50 or hour == 20 and minute <= 0:
+    elif hour == 22 and minute >= 55 or hour == 23 and minute <= 5:
         if pic_send == 0:
             for item in IDs:
                 bot.send_message(item, 'Сладких снов, китя)')
