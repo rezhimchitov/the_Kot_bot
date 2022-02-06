@@ -31,19 +31,19 @@ def get_photo(bot, pic_json):
     now = datetime.datetime.now()
     hour = now.hour
     minute = now.minute
-    if hour == 8 and minute >= 59 or hour == 9 and minute <= 0:
+    if hour == 8 and minute >= 55 or hour == 9 and minute <= 5:
         for item in IDs:
             bot.send_message(item, 'Вставай, сонный котенок!')
             bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-    elif hour == 22 and minute >= 59 or hour == 23 and minute <= 0:
+    elif hour == 22 and minute >= 55 or hour == 23 and minute <= 5:
          for item in IDs:
             bot.send_message(item, 'Сладких снов, китя)')
             bot.send_photo(item, pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-    else: return(0)
-    tt = threading.Timer(61.0, get_photo, args=[bot, pic_json])
+
+    tt = threading.Timer(300.0, get_photo, args=[bot, pic_json])
     tt.start()
 
-t = threading.Timer(61.0, get_photo, args=[bot, pic_json])
+t = threading.Timer(300.0, get_photo, args=[bot, pic_json])
 t.start()  
 
 get_photo(bot, pic_json)              
