@@ -5,6 +5,7 @@ import random
 import threading
 import datetime
 import json
+import sys
 
 def resfreshPics():
     return requests.get(f'https://pixabay.com/api/?key={pixabay}&q={tags}&image_type=photo&pretty=true&per_page={amount}').json()
@@ -26,25 +27,34 @@ bot = telebot.TeleBot(kotoken)
 def send_welcome(message):
     bot.send_message(message.from_user.id, f"Приветствуем в нашем кошачьем царстве!\n \nМогу прислать котика, а если напишешь мне 'подписка', то пополнишь нашу кошачью армию!\n \n'Отписка' сделает тебя дезертиром(\n \nТак что решайся, муррр :3")
     bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-    print(f'Sent message to {message.chat.id}: {message.text}')
+    sys.stdout.write(str(f'Got message from {message.chat.id}: {message.text}') + '\n')
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    print(f'Sent message to {message.chat.id}: {message.text}')
-    if str.lower(message.text) ==  "подписка":
-        IDs.append(message.chat.id)
-        print(IDs)
-        bot.send_message(message.from_user.id, 'Теперь ты котик!')
-        bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-    elif str.lower(message.text) ==  "отписка": 
-        IDs.remove(message.chat.id)
-        print(IDs)
-        bot.send_message(message.from_user.id, 'Прощай(')
-        bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-    else:
-        bot.send_message(message.from_user.id, 'Бля, держи кота')#
-        bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
-
+    sys.stdout.write(str(f'Got message from {message.chat.id}: {message.text}') + '\n')
+    match str.lower(message.text):
+        case "подписка":
+            if message.chat.id not in IDs:
+                IDs.append(message.chat.id)
+                sys.stdout.write(str(f'User subscibed: {message.chat.id}') + '\n')
+                bot.send_message(message.from_user.id, 'Теперь ты котик!')
+                bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+            else:
+                bot.send_message(message.from_user.id, 'Ты подписан, дурачок')
+                bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+        case "отписка":
+            if message.chat.id in IDs:
+                IDs.remove(message.chat.id)
+                sys.stdout.write(str(f'User left: {message.chat.id}') + '\n')
+                bot.send_message(message.from_user.id, 'Прощай(')
+                bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+            else:
+                bot.send_message(message.from_user.id, 'Ты не подписан, дурачок')
+                bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+        case _:
+            bot.send_message(message.from_user.id, 'Бля, держи кота')
+            bot.send_photo(message.from_user.id,pic_json.get('hits')[random.randint(0, 199)]['largeImageURL'] )
+    
 def get_photo(bot, pic_json):
     global pic_send
     now = datetime.datetime.now()
@@ -65,6 +75,7 @@ def get_photo(bot, pic_json):
     else: pic_send = 0
     tt = threading.Timer(300.0, get_photo, args=[bot, pic_json])
     tt.start()
+
 
 get_photo(bot, pic_json)              
 
