@@ -5,7 +5,7 @@ import random
 import threading
 import datetime
 import json
-import sys, os
+import sys
 
 def resfreshPics():
     try:
