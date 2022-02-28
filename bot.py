@@ -7,7 +7,7 @@ import datetime
 import json
 import sys
 
-def resfreshPics():
+def refreshPics():
     try:
         return requests.get(f'https://pixabay.com/api/?key={pixabay}&q={tags}&image_type=photo&pretty=true&per_page={amount}').json()
     except Exception as ex:
@@ -46,6 +46,7 @@ try:
     config.read('token.ini')
     kotoken = config.get('token', 'kot_token')
     pixabay = config.get('token', 'pixabay_token')
+    admin_id = config.get('token', 'admin_id')
 except Exception as ex:
     sys.stdout.write(str(ex))
     sys.exit()
@@ -64,7 +65,7 @@ except Exception as ex:
     sys.stdout.write(str(ex))
     sys.stdout.write('File not found, rollbacked to defaults')
 
-pic_json = resfreshPics()
+pic_json = refreshPics()
 bot = telebot.TeleBot(kotoken)
 
 @bot.message_handler(commands=['start'])
@@ -80,6 +81,17 @@ def send_welcome(message):
             bot.send_message(message.from_user.id, 'У нас технические шоколадки(')
         except Exception as ex:
             sys.stdout.write(str(ex))
+
+@bot.message_handler(commands=['refresh'])
+def refresh_pics(message):
+    try:
+        if str(message.chat.id) == admin_id:
+            refreshPics()
+            bot.send_message(message.from_user.id, 'Refreshing done')
+        else: return()
+    except Exception as ex:
+        sys.stdout.write(str(ex))
+        sys.stdout.write('Unable to refresh pics command!')
         
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
