@@ -57,26 +57,11 @@ class pics_service:
         logging.info('Refreshing JSON...')
         self.refresh_pics()
 
-    def check_mailing(self):
+    def sheduled_check(self):
         now = datetime.datetime.now()
-        hour = now.hour
-        minute = now.minute
-        try:
-            if hour == 8 and minute >= 55 or hour == 9 and minute <= 5:
-                if pic_send == 0:
-                    pic_send = 1
-                    return True, 'Вставай, сонный котенок!', self.pic_json.get('hits')[random.randint(0, 199)]['largeImageURL']
-
-            elif hour == 22 and minute >= 55 or hour == 23 and minute <= 5:
-                if pic_send == 0:
-                    pic_send = 1
-                    return True, 'Сладких снов, китя', self.pic_json.get('hits')[random.randint(0, 199)]['largeImageURL']
-
-            else: pic_send = 0
-
-        except Exception as ex:
-            self.logger.error(str(ex))
-            self.logger.error('Unable to send morning/evening message!')
+        if now.hour < 10:
+            return 'Вставай, сонный котенок!', self.pic_json.get('hits')[random.randint(0, 199)]['largeImageURL']
+        else: return 'Сладких снов, китя', self.pic_json.get('hits')[random.randint(0, 199)]['largeImageURL']
 
     def get_random_photo(self):
         try:

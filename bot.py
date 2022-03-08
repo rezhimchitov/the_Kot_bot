@@ -1,13 +1,16 @@
 import telebot
-import threading
+from telebot.async_telebot import AsyncTeleBot
+from threading import Thread
+import asyncio
 import json
 import sys
 import logging
+import schedule
+import time
 from service import pics_service
 
 logging.basicConfig(filename="main_logger.log", level=logging.DEBUG)
 main_service = pics_service()
-
 bot = telebot.TeleBot(main_service.kotoken)
 
 @bot.message_handler(commands=['start'])
@@ -74,11 +77,28 @@ def get_text_messages(message):
         except Exception as ex:
             logging.error(str(ex))
 
-def timer_function():
+def schedule_func():
     global main_service
     global bot
-    main_service.check_mailing()
-    tt = threading.Timer(300.0, timer_function, args=[bot, main_service.pic_json])
-    tt.start()
+    logging.info('Scheduled work started')
+    text, photo = main_service.sheduled_check()
+    for id in main_service.IDs:
+        try:
+            bot.send_message(id, text)
+            bot.send_photo(id, photo)
+        except Exception as ex:
+            logging.error(str(ex))
 
-bot.polling(none_stop=True)
+schedule.every().day.at("09:00").do(schedule_func)
+schedule.every().day.at("22:00").do(schedule_func)
+
+def run_async():
+    global bot
+    asyncio.run(bot.polling())
+
+thread = Thread(target = run_async, name = 'Bot Polling Thread')
+thread.start()
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
