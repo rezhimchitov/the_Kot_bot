@@ -1,5 +1,4 @@
 import telebot
-from telebot.async_telebot import AsyncTeleBot
 from threading import Thread
 import asyncio
 import json
@@ -9,7 +8,7 @@ import schedule
 import time
 from service import pics_service
 
-logging.basicConfig(filename="main_logger.log", level=logging.DEBUG)
+logging.basicConfig(filename="main_logger.log", level=logging.INFO)
 main_service = pics_service()
 bot = telebot.TeleBot(main_service.kotoken)
 
@@ -81,6 +80,7 @@ def schedule_func():
     global main_service
     global bot
     logging.info('Scheduled work started')
+    main_service.refresh_pics()
     text, photo = main_service.sheduled_check()
     for id in main_service.IDs:
         try:
@@ -90,7 +90,7 @@ def schedule_func():
             logging.error(str(ex))
 
 schedule.every().day.at("09:00").do(schedule_func)
-schedule.every().day.at("22:00").do(schedule_func)
+schedule.every().day.at("23:00").do(schedule_func)
 
 def run_async():
     global bot
