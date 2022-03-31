@@ -42,7 +42,7 @@ def taro_text(message):
             bot.send_message(message.from_user.id, 'У нас технические шоколадки(')
         except Exception as ex:
             logging.error(str(ex))
-        
+    
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     logging.info(f'Got message from {message.chat.id}: {message.text}\n')
