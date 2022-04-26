@@ -8,11 +8,12 @@ import schedule
 import time
 from pics_service import PicsService
 from taro_service import TaroService
-from card import GenericCard
+from holidays_service import HolidaysService
 
 logging.basicConfig(filename="main_logger.log", level=logging.INFO)
 main_service = PicsService()
 taro_service = TaroService()
+holidays_service = HolidaysService()
 bot = telebot.TeleBot(main_service.kotoken)
 
 @bot.message_handler(commands=['start'])
@@ -38,6 +39,20 @@ def taro_text(message):
     except Exception as ex:
         logging.error(str(ex))
         logging.error('Unable to send taro message!')
+        try:
+            bot.send_message(message.from_user.id, 'У нас технические шоколадки(')
+        except Exception as ex:
+            logging.error(str(ex))
+
+@bot.message_handler(commands=['holidays'])
+def taro_text(message):
+    logging.info(f'Got message from {message.chat.id}: {message.text}\n')
+    try:
+        bot.send_message(message.from_user.id, f"А ты любишь праздники?\n \nКаждый день особенный, прямо как ты ^-^ \n \nЕсли хочешь узнать, какие сегодня праздники - пиши 'праздники' :3")
+        bot.send_photo(message.from_user.id, main_service.get_random_photo())
+    except Exception as ex:
+        logging.error(str(ex))
+        logging.error('Unable to send holidays message!')
         try:
             bot.send_message(message.from_user.id, 'У нас технические шоколадки(')
         except Exception as ex:
@@ -85,6 +100,11 @@ def get_text_messages(message):
                 bot.send_photo(message.from_user.id, open(taro_pic, 'rb'))
                 bot.send_message(message.from_user.id, taro_text)
                 time.sleep(2)
+        elif lowered_text == "праздники":
+            list_of_holidays = holidays_service.send_holidays()
+            for holiday_message in list_of_holidays:
+                bot.send_message(message.from_user.id, holiday_message)
+            bot.send_photo(message.from_user.id, main_service.get_random_photo())
         else:
             bot.send_message(message.from_user.id, 'Бля, держи кота')
             bot.send_photo(message.from_user.id, main_service.get_random_photo())
