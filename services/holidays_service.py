@@ -23,7 +23,7 @@ class HolidaysService:
         
         self.month = self.month_base[self.month_number - 1]
 
-        holidays_link = f'https://kakoysegodnyaprazdnik.ru/baza/{self.month}/{self.day}'
+        holidays_link = f'http://kakoysegodnyaprazdnik.ru/baza/{self.month}/{self.day}'
         self.response = requests.get(holidays_link, headers=self.headers)
 
         soup = BeautifulSoup(self.response.content, 'lxml')
